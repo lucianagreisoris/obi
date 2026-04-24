@@ -33,19 +33,19 @@ VIDEO_CONFIGS = {
         "source_dir": ROOT / "assets" / "video 1",
         "blocks": [
             {
-                "spoken_text": "¿Fabricás cinturones? Agregale un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
-                "subtitle_text": "¿Fabricás cinturones? Agregale un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
+                "spoken_text": "¿Fabricás cinturones? Agregále un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
+                "subtitle_text": "¿Fabricás cinturones? Agregále un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
                 "images": ["1.jpeg", "2.jpeg"],
             },
             {
                 "spoken_text": "Cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
                 "subtitle_text": "Cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
-                "images": ["3.jpeg", "4.jpeg", "5.jpeg"],
+                "images": ["3.jpeg", "4.jpeg", "A.jpeg", "5.jpeg"],
             },
             {
                 "spoken_text": "También botones forrados en la tela de la prenda, en todos los tamaños.",
                 "subtitle_text": "También botones forrados en la tela de la prenda, en todos los tamaños.",
-                "images": ["6.jpeg", "7.jpeg", "8..jpeg"],
+                "images": ["B.jpeg", "6.jpeg", "7.jpeg", "8..jpeg"],
             },
             {
                 "spoken_text": "Hebillas forradas en todos los pases: veinte, treinta, cuarenta, cincuenta y sesenta milímetros.",
@@ -124,7 +124,7 @@ def write_srt(cues: Iterable[Cue], destination: Path) -> None:
 def parse_duration_seconds(stderr_text: str) -> float:
     match = re.search(r"Duration:\s*(\d+):(\d+):(\d+\.\d+)", stderr_text)
     if not match:
-        raise RuntimeError("No pude leer la duración del audio generado.")
+        raise RuntimeError("No pude leer la duracion del audio generado.")
     hours, minutes, seconds = match.groups()
     return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
 
@@ -212,7 +212,7 @@ def build_slides(cues: list[Cue]) -> list[Slide]:
         image_paths = [CURRENT_CONFIG["source_dir"] / name for name in block["images"]]
         image_paths = [path for path in image_paths if path.exists()]
         if not image_paths:
-            raise FileNotFoundError("No encontré imágenes para uno de los bloques del video.")
+            raise FileNotFoundError("No encontre imagenes para uno de los bloques del video.")
 
         per_image = (cue.end - cue.start) / len(image_paths)
         for index, image_path in enumerate(image_paths):
