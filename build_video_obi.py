@@ -33,13 +33,13 @@ VIDEO_CONFIGS = {
         "source_dir": ROOT / "assets" / "video 1",
         "blocks": [
             {
-                "spoken_text": "¿Fabricás pantalones? Agregale un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
-                "subtitle_text": "¿Fabricás pantalones? Agregale un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
+                "spoken_text": "¿Fabricás cinturones? Agregale un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
+                "subtitle_text": "¿Fabricás cinturones? Agregale un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
                 "images": ["1.jpeg", "2.jpeg"],
             },
             {
-                "spoken_text": "Características del producto: cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
-                "subtitle_text": "Características del producto: cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
+                "spoken_text": "Cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
+                "subtitle_text": "Cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
                 "images": ["3.jpeg", "4.jpeg", "5.jpeg"],
             },
             {
