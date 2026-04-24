@@ -1,0 +1,9 @@
+<svg width="1200" height="1400" viewBox="0 0 1200 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1400" fill="#EEE6DE"/>
+  <rect x="88" y="90" width="1024" height="1220" rx="48" fill="#FCF6F0"/>
+  <circle cx="320" cy="390" r="176" fill="#B8572F"/>
+  <circle cx="826" cy="460" r="230" fill="#DAB39E"/>
+  <rect x="180" y="786" width="840" height="140" rx="70" fill="#E7D0C3"/>
+  <rect x="180" y="968" width="840" height="140" rx="70" fill="#D79B79"/>
+  <text x="600" y="1238" text-anchor="middle" fill="#6D5A51" font-family="Arial, sans-serif" font-size="42">Agregar foto de maquinas o costura</text>
+</svg>

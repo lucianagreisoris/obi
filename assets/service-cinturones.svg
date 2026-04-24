@@ -1,0 +1,11 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="900" fill="#F4E7DD"/>
+  <rect x="72" y="72" width="1056" height="756" rx="40" fill="#FFF8F2"/>
+  <rect x="136" y="166" width="928" height="334" rx="32" fill="#D29A78"/>
+  <rect x="210" y="278" width="780" height="108" rx="54" fill="#8F3F27"/>
+  <rect x="826" y="246" width="132" height="172" rx="28" fill="#F0D5C7"/>
+  <rect x="158" y="560" width="884" height="76" rx="38" fill="#EAD3C4"/>
+  <rect x="158" y="664" width="596" height="76" rx="38" fill="#E3BDA6"/>
+  <text x="600" y="120" text-anchor="middle" fill="#6D2F1D" font-family="Arial, sans-serif" font-size="34">Preview de video</text>
+  <text x="600" y="786" text-anchor="middle" fill="#6F5B51" font-family="Arial, sans-serif" font-size="40">Cinturones y hebillas forradas</text>
+</svg>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://obicint.com.ar/sitemap.xml

@@ -1,0 +1,13 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#F3E8DC"/>
+  <rect x="60" y="60" width="1080" height="510" rx="40" fill="url(#paint0_linear_1_2)"/>
+  <text x="118" y="250" fill="#FFF6EF" font-family="Georgia, serif" font-size="74" font-weight="700">Servicios para confeccionistas</text>
+  <text x="118" y="332" fill="#FCEEE5" font-family="Arial, sans-serif" font-size="34">Corte, costura, armado y terminacion</text>
+  <text x="118" y="390" fill="#F5D9CB" font-family="Arial, sans-serif" font-size="28">Landing de una pagina lista para SEO y contacto</text>
+  <defs>
+    <linearGradient id="paint0_linear_1_2" x1="168" y1="86" x2="1058" y2="578" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B8572F"/>
+      <stop offset="1" stop-color="#3A2922"/>
+    </linearGradient>
+  </defs>
+</svg>
