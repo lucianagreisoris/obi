@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import math
+import re
 import subprocess
 import textwrap
 from dataclasses import dataclass
@@ -11,7 +12,6 @@ from typing import Iterable
 
 import edge_tts
 import imageio_ffmpeg
-from edge_tts.submaker import SubMaker
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 
@@ -22,55 +22,62 @@ VIDEO_SIZE = (1280, 720)
 PHOTO_AREA_HEIGHT = 590
 FPS = 30
 VOICE = "es-AR-TomasNeural"
-VOICE_RATE = "-8%"
-VOICE_PITCH = "-2Hz"
+VOICE_RATE = "-14%"
+VOICE_PITCH = "+0Hz"
+PAUSE_BETWEEN_BLOCKS = 0.35
+TAIL_PAD_SECONDS = 0.25
 
 VIDEO_CONFIGS = {
     "video1": {
         "slug": "video-obi-cinturones",
         "source_dir": ROOT / "assets" / "video 1",
-        "spoken_lines": [
-            "Fabricas pantalones? Agregale un cinturon con la misma tela de la prenda que completa y diferencia la prenda, otorgandole mayor calidad.",
-            "Caracteristicas del producto: cinturon bien armado con hebilla forrada y pase metalica.",
-            "Los clientes que lo han incorporado lo repiten permanentemente, senal de que el producto funciona y vende.",
-            "Tambien botones forrados en la tela de la prenda, en todos los tamanos.",
-            "Hebillas forradas en todos los pases 20, 30, 40, 50 y 60 milimetros.",
-            "Cinturones en pu, ideal para incorporar y a un valor muy competitivo.",
-        ],
-        "subtitle_blocks": [
-            "Fabricas pantalones? Agregale un cinturon con la misma tela de la prenda que completa y diferencia la prenda, otorgandole mayor calidad.",
-            "Caracteristicas del producto: cinturon bien armado con hebilla forrada y pase metalica. Los clientes que lo han incorporado lo repiten permanentemente, senal de que el producto funciona y vende.",
-            "Tambien botones forrados en la tela de la prenda, en todos los tamanos.",
-            "Hebillas forradas en todos los pases 20,30,40,50 y 60mm",
-            "Cinturones en PU, ideal para incorporar y a un valor muy competitivo.",
-        ],
-        "sentence_groups": [1, 2, 1, 1, 1],
-        "sections": [
-            {"images": ["1.jpeg", "2.jpeg"], "block_index": 0},
-            {"images": ["3.jpeg", "4.jpeg", "5.jpeg"], "block_index": 1},
-            {"images": ["6.jpeg", "7.jpeg", "8..jpeg"], "block_index": 2},
-            {"images": ["9.jpeg", "10.jpeg", "11.jpeg", "12.jpeg", "13.jpeg"], "block_index": 3},
-            {"images": ["14.jpeg"], "block_index": 4},
+        "blocks": [
+            {
+                "spoken_text": "¿Fabricás pantalones? Agregale un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
+                "subtitle_text": "¿Fabricás pantalones? Agregale un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
+                "images": ["1.jpeg", "2.jpeg"],
+            },
+            {
+                "spoken_text": "Características del producto: cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
+                "subtitle_text": "Características del producto: cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
+                "images": ["3.jpeg", "4.jpeg", "5.jpeg"],
+            },
+            {
+                "spoken_text": "También botones forrados en la tela de la prenda, en todos los tamaños.",
+                "subtitle_text": "También botones forrados en la tela de la prenda, en todos los tamaños.",
+                "images": ["6.jpeg", "7.jpeg", "8..jpeg"],
+            },
+            {
+                "spoken_text": "Hebillas forradas en todos los pases: veinte, treinta, cuarenta, cincuenta y sesenta milímetros.",
+                "subtitle_text": "Hebillas forradas en todos los pases: 20, 30, 40, 50 y 60 mm.",
+                "images": ["9.jpeg", "10.jpeg", "11.jpeg", "12.jpeg", "13.jpeg"],
+            },
+            {
+                "spoken_text": "Cinturones en pu, ideal para incorporar y a un valor muy competitivo.",
+                "subtitle_text": "Cinturones en PU, ideal para incorporar y a un valor muy competitivo.",
+                "images": ["14.jpeg"],
+            },
         ],
     },
     "video2": {
         "slug": "video-obi-detalles",
         "source_dir": ROOT / "assets" / "fotos 2",
-        "spoken_lines": [
-            "Alamares y trabas.",
-            "Pitucones.",
-            "Vivo en la tela de la prenda que complementan tu coleccion.",
-        ],
-        "subtitle_blocks": [
-            "Alamares y trabas.",
-            "Pitucones.",
-            "Vivo en la tela de la prenda que complementan tu coleccion.",
-        ],
-        "sentence_groups": [1, 1, 1],
-        "sections": [
-            {"images": ["1.jpeg", "2.jpeg", "3.jpeg", "4.jpeg", "5.jpeg"], "block_index": 0},
-            {"images": ["6.jpeg", "7.jpeg"], "block_index": 1},
-            {"images": ["8.jpeg"], "block_index": 2},
+        "blocks": [
+            {
+                "spoken_text": "Alamares y trabas.",
+                "subtitle_text": "ALAMARES Y TRABAS",
+                "images": ["1.jpeg", "2.jpeg", "3.jpeg", "4.jpeg", "5.jpeg"],
+            },
+            {
+                "spoken_text": "Pitucones.",
+                "subtitle_text": "PITUCONES",
+                "images": ["6.jpeg", "7.jpeg"],
+            },
+            {
+                "spoken_text": "Vivo en la tela de la prenda, que complementan tu colección.",
+                "subtitle_text": "VIVO EN LA TELA DE LA PRENDA QUE COMPLEMENTAN TU COLECCIÓN",
+                "images": ["8.jpeg"],
+            },
         ],
     },
 }
@@ -114,48 +121,85 @@ def write_srt(cues: Iterable[Cue], destination: Path) -> None:
     destination.write_text("\n".join(parts), encoding="utf-8")
 
 
+def parse_duration_seconds(stderr_text: str) -> float:
+    match = re.search(r"Duration:\s*(\d+):(\d+):(\d+\.\d+)", stderr_text)
+    if not match:
+        raise RuntimeError("No pude leer la duración del audio generado.")
+    hours, minutes, seconds = match.groups()
+    return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+
+
+def probe_duration_seconds(path: Path) -> float:
+    ffmpeg_path = Path(imageio_ffmpeg.get_ffmpeg_exe())
+    result = subprocess.run(
+        [str(ffmpeg_path), "-i", str(path)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return parse_duration_seconds(result.stderr)
+
+
 async def synthesize_voice(audio_path: Path, subtitle_path: Path) -> list[Cue]:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    spoken_lines = CURRENT_CONFIG["spoken_lines"]
-    subtitle_blocks = CURRENT_CONFIG["subtitle_blocks"]
-    sentence_groups = CURRENT_CONFIG["sentence_groups"]
+    slug = CURRENT_CONFIG["slug"]
+    blocks = CURRENT_CONFIG["blocks"]
+    ffmpeg_path = imageio_ffmpeg.get_ffmpeg_exe()
 
-    communicate = edge_tts.Communicate(
-        " ".join(spoken_lines),
-        voice=VOICE,
-        rate=VOICE_RATE,
-        pitch=VOICE_PITCH,
-        boundary="SentenceBoundary",
-    )
-    sub_maker = SubMaker()
+    temp_dir = OUTPUT_DIR / f"{slug}-tts"
+    temp_dir.mkdir(parents=True, exist_ok=True)
 
-    with audio_path.open("wb") as audio_file:
-        async for chunk in communicate.stream():
-            if chunk["type"] == "audio":
-                audio_file.write(chunk["data"])
-            elif chunk["type"] == "SentenceBoundary":
-                sub_maker.feed(chunk)
-
-    sentence_cues = sub_maker.cues[: len(spoken_lines)]
-    if len(sentence_cues) < len(spoken_lines):
-        raise RuntimeError("No llegaron suficientes marcas de frase para sincronizar el audio.")
-
+    segment_paths: list[Path] = []
     cues: list[Cue] = []
-    cursor = 0
-    for index, block_size in enumerate(sentence_groups, start=1):
-        group = sentence_cues[cursor : cursor + block_size]
-        cursor += block_size
-        if not group:
-            raise RuntimeError("No se pudo construir un bloque de subtitulo.")
+    cursor = 0.0
 
-        cues.append(
-            Cue(
-                index=index,
-                start=group[0].start.total_seconds(),
-                end=group[-1].end.total_seconds() + 0.4,
-                text=subtitle_blocks[index - 1],
-            )
+    for index, block in enumerate(blocks, start=1):
+        segment_path = temp_dir / f"block-{index:02}.mp3"
+        communicate = edge_tts.Communicate(
+            block["spoken_text"],
+            voice=VOICE,
+            rate=VOICE_RATE,
+            pitch=VOICE_PITCH,
         )
+        await communicate.save(str(segment_path))
+
+        duration = probe_duration_seconds(segment_path)
+        start = cursor
+        end = start + duration
+        segment_paths.append(segment_path)
+        cues.append(Cue(index=index, start=start, end=end, text=block["subtitle_text"]))
+        cursor = end + PAUSE_BETWEEN_BLOCKS
+
+    concat_file = temp_dir / "audio-concat.txt"
+    concat_lines = []
+    for index, segment_path in enumerate(segment_paths):
+        duration = probe_duration_seconds(segment_path)
+        concat_lines.append(f"file '{segment_path.name}'")
+        if index < len(segment_paths) - 1:
+            concat_lines.append(f"duration {duration + PAUSE_BETWEEN_BLOCKS:.3f}")
+        else:
+            concat_lines.append(f"duration {duration + TAIL_PAD_SECONDS:.3f}")
+    concat_lines.append(f"file '{segment_paths[-1].name}'")
+    concat_file.write_text("\n".join(concat_lines), encoding="utf-8")
+
+    concat_command = [
+        ffmpeg_path,
+        "-y",
+        "-f",
+        "concat",
+        "-safe",
+        "0",
+        "-i",
+        str(concat_file),
+        "-af",
+        f"apad=pad_dur={TAIL_PAD_SECONDS:.2f}",
+        "-c:a",
+        "mp3",
+        "-q:a",
+        "2",
+        str(audio_path),
+    ]
+    subprocess.run(concat_command, check=True, cwd=temp_dir)
 
     write_srt(cues, subtitle_path)
     return cues
@@ -163,17 +207,17 @@ async def synthesize_voice(audio_path: Path, subtitle_path: Path) -> list[Cue]:
 
 def build_slides(cues: list[Cue]) -> list[Slide]:
     slides: list[Slide] = []
-    for section in CURRENT_CONFIG["sections"]:
-        block = cues[section["block_index"]]
-        image_paths = [CURRENT_CONFIG["source_dir"] / name for name in section["images"]]
+    blocks = CURRENT_CONFIG["blocks"]
+    for cue, block in zip(cues, blocks):
+        image_paths = [CURRENT_CONFIG["source_dir"] / name for name in block["images"]]
         image_paths = [path for path in image_paths if path.exists()]
         if not image_paths:
-            raise FileNotFoundError("No encontre imagenes para uno de los bloques del video.")
+            raise FileNotFoundError("No encontré imágenes para uno de los bloques del video.")
 
-        per_image = (block.end - block.start) / len(image_paths)
+        per_image = (cue.end - cue.start) / len(image_paths)
         for index, image_path in enumerate(image_paths):
-            start = block.start + per_image * index
-            end = block.start + per_image * (index + 1)
+            start = cue.start + per_image * index
+            end = cue.start + per_image * (index + 1)
             slides.append(Slide(path=image_path, start=start, end=end))
 
     return slides
@@ -235,9 +279,9 @@ def build_slide_frame(slide: Slide, current_time: float) -> Image.Image:
     background = background.filter(ImageFilter.GaussianBlur(radius=28))
     background = Image.blend(background, Image.new("RGB", photo_size, "#3a291f"), 0.26)
 
-    zoom = 1.0 + 0.03 * progress
-    pan_x = int((progress - 0.5) * min(22, source.width * 0.02))
-    pan_y = int((0.5 - progress) * min(14, source.height * 0.015))
+    zoom = 1.0 + 0.018 * progress
+    pan_x = int((progress - 0.5) * min(10, source.width * 0.009))
+    pan_y = int((0.5 - progress) * min(8, source.height * 0.008))
     crop_w = max(1, int(source.width / zoom))
     crop_h = max(1, int(source.height / zoom))
     left = max(0, min(source.width - crop_w, (source.width - crop_w) // 2 + pan_x))
@@ -307,7 +351,7 @@ def export_video(
         crop_x = f"(iw-{VIDEO_SIZE[0]})*(0.5-0.5*cos(PI*t/{duration:.4f}))"
         crop_y = f"(ih-{VIDEO_SIZE[1]})*(0.5-0.5*cos(PI*t/{duration:.4f}))"
         vf = (
-            "scale=1300:730,"
+            "scale=1294:726,"
             f"crop={VIDEO_SIZE[0]}:{VIDEO_SIZE[1]}:x='{crop_x}':y='{crop_y}',"
             f"fps={FPS},format=yuv420p,setsar=1"
         )
@@ -339,7 +383,8 @@ def export_video(
     subtitle_filter = (
         f"subtitles=../{subtitle_path.name}:"
         "force_style='FontName=Arial,FontSize=22,PrimaryColour=&H000000&,"
-        "BackColour=&HFFFFFF&,BorderStyle=3,Outline=0,Shadow=0,MarginV=24,Alignment=2'"
+        "BackColour=&HFFFFFF&,BorderStyle=3,Outline=0,Shadow=0,MarginV=24,Alignment=2',"
+        "setsar=1"
     )
     final_command = [
         ffmpeg_path,

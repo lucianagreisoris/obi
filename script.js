@@ -68,19 +68,19 @@ function startModalVideo(video) {
   }
 
   video.pause();
-  video.currentTime = 0;
   video.load();
 
-  const tryPlay = () => {
-    video.play().catch(() => {});
+  const tryPlay = async () => {
+    video.currentTime = 0;
+    try {
+      await video.play();
+    } catch {
+      video.controls = true;
+    }
   };
-
-  if (video.readyState >= 2) {
-    tryPlay();
-    return;
-  }
-
-  video.addEventListener("loadeddata", tryPlay, { once: true });
+  window.setTimeout(() => {
+    void tryPlay();
+  }, 60);
 }
 
 document.querySelectorAll("dialog").forEach((modal) => {

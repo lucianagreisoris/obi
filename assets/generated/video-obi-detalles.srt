@@ -1,12 +1,12 @@
 1
-00:00:00,100 --> 00:00:02,560
-Alamares y trabas.
+00:00:00,000 --> 00:00:02,450
+ALAMARES Y TRABAS
 
 2
-00:00:02,160 --> 00:00:04,139
-Pitucones.
+00:00:02,800 --> 00:00:04,770
+PITUCONES
 
 3
-00:00:03,789 --> 00:00:07,993
-Vivo en la tela de la prenda que
-complementan tu colección.
+00:00:05,120 --> 00:00:09,820
+VIVO EN LA TELA DE LA PRENDA QUE
+COMPLEMENTAN TU COLECCIÓN
