@@ -38,13 +38,13 @@ VIDEO_CONFIGS = {
                 "spoken_text": "¿Fabricás pantalones? Agregále un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
                 "subtitle_text": "¿Fabricás pantalones? Agregále un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
                 "images": ["1.jpeg", "2.jpeg", "AA.jpeg", "AB.jpeg"],
-                "image_weights": [1.35, 1.35, 0.65, 0.65],
+                "image_weights": [1.45, 1.45, 0.85, 0.85],
             },
             {
                 "spoken_text": "Cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
                 "subtitle_text": "Cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
                 "images": ["3.jpeg", "4.jpeg", "A.jpeg", "5.jpeg"],
-                "image_weights": [1.4, 1.35, 0.7, 0.55],
+                "image_weights": [1.55, 1.45, 0.95, 0.85],
             },
             {
                 "spoken_text": "También botones forrados en la tela de la prenda, en todos los tamaños.",
@@ -307,8 +307,9 @@ def build_slide_frame(slide: Slide, current_time: float) -> Image.Image:
     left = max(0, min(source.width - crop_w, (source.width - crop_w) // 2 + pan_x))
     top = max(0, min(source.height - crop_h, (source.height - crop_h) // 2 + pan_y))
     foreground = source.crop((left, top, left + crop_w, top + crop_h))
-    right_panel_left = VIDEO_SIZE[0] - SUBTITLE_PANEL_WIDTH - 34
-    content_width = right_panel_left - 64
+    left_panel_left = 34
+    content_left = left_panel_left + SUBTITLE_PANEL_WIDTH + 34
+    content_width = VIDEO_SIZE[0] - content_left - 40
     foreground = fit_contain(foreground, (content_width, VIDEO_SIZE[1] - 96))
 
     frame = Image.new("RGBA", VIDEO_SIZE, "#201713")
@@ -318,7 +319,7 @@ def build_slide_frame(slide: Slide, current_time: float) -> Image.Image:
     panel = panel.filter(ImageFilter.GaussianBlur(radius=1))
     frame.paste(panel, (40, 14), panel)
 
-    fg_left = 40 + max(0, (content_width - foreground.width) // 2)
+    fg_left = content_left + max(0, (content_width - foreground.width) // 2)
     fg_top = (VIDEO_SIZE[1] - foreground.height) // 2
     shadow = Image.new("RGBA", (foreground.width + 20, foreground.height + 20), (0, 0, 0, 0))
     shadow_draw = ImageDraw.Draw(shadow)
@@ -348,7 +349,7 @@ def build_slide_frame(slide: Slide, current_time: float) -> Image.Image:
         width=1,
     )
     subtitle_panel = subtitle_panel.filter(ImageFilter.GaussianBlur(radius=0.6))
-    frame.paste(subtitle_panel, (right_panel_left, 110), subtitle_panel)
+    frame.paste(subtitle_panel, (left_panel_left, 110), subtitle_panel)
     return frame
 
 
@@ -414,7 +415,7 @@ def export_video(
         f"subtitles=../{subtitle_path.name}:"
         "force_style='FontName=Segoe UI Semibold,FontSize=20,PrimaryColour=&H00FFFFFF&,"
         "OutlineColour=&H00221814&,BackColour=&H00000000&,BorderStyle=1,Outline=1.2,"
-        "Shadow=0,MarginL=0,MarginR=56,MarginV=0,Alignment=6',"
+        "Shadow=0,MarginL=58,MarginR=0,MarginV=0,Alignment=4',"
         "setsar=1"
     )
     final_command = [
