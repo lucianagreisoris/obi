@@ -243,6 +243,40 @@ textarea {
   box-shadow: var(--shadow);
 }
 
+.service-links,
+.related-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.service-link,
+.related-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid rgba(139, 69, 45, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 251, 247, 0.92);
+  color: var(--accent-dark);
+  font-size: 0.92rem;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.service-link:hover,
+.service-link:focus-visible,
+.related-link:hover,
+.related-link:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(139, 69, 45, 0.38);
+  background: #fff;
+}
+
 .intro-copy {
   display: grid;
   gap: 0.45rem;
