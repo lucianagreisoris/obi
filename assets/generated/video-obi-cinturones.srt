@@ -1,5 +1,5 @@
 1
-00:00:00,000 --> 00:00:11,300
+00:00:00,000 --> 00:00:10,300
 ¿Fabricás pantalones?
 Agregále un cinturón con
 la misma tela de la
@@ -9,7 +9,7 @@ otorgándole mayor
 calidad.
 
 2
-00:00:11,650 --> 00:00:24,950
+00:00:10,650 --> 00:00:22,750
 Cinturón bien armado,
 con hebilla forrada y
 pase metálica. Los
@@ -20,19 +20,19 @@ de que el producto
 funciona y vende.
 
 3
-00:00:25,300 --> 00:00:31,130
+00:00:23,820 --> 00:00:29,120
 También botones forrados
 en la tela de la prenda,
 en todos los tamaños.
 
 4
-00:00:31,480 --> 00:00:40,380
+00:00:29,470 --> 00:00:37,580
 Hebillas forradas en
 todos los pases: 20, 30,
 40, 50 y 60 mm.
 
 5
-00:00:40,730 --> 00:00:46,830
+00:00:37,930 --> 00:00:43,470
 Cinturones en PU, ideal
 para incorporar y a un
 valor muy competitivo.

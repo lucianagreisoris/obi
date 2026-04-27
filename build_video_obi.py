@@ -22,8 +22,8 @@ VIDEO_SIZE = (1280, 720)
 PHOTO_AREA_HEIGHT = VIDEO_SIZE[1]
 FPS = 30
 VOICE = "es-AR-TomasNeural"
-VOICE_RATE = "-20%"
-VOICE_PITCH = "-10Hz"
+VOICE_RATE = "-12%"
+VOICE_PITCH = "-2Hz"
 PAUSE_BETWEEN_BLOCKS = 0.35
 TAIL_PAD_SECONDS = 0.25
 SUBTITLE_WRAP = 24
@@ -45,6 +45,7 @@ VIDEO_CONFIGS = {
                 "subtitle_text": "Cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
                 "images": ["3.jpeg", "4.jpeg", "A.jpeg", "5.jpeg"],
                 "image_weights": [1.55, 1.45, 0.95, 0.85],
+                "timeline_pad_after": 0.72,
             },
             {
                 "spoken_text": "También botones forrados en la tela de la prenda, en todos los tamaños.",
@@ -173,7 +174,7 @@ async def synthesize_voice(audio_path: Path, subtitle_path: Path) -> list[Cue]:
         end = start + duration
         segment_paths.append(segment_path)
         cues.append(Cue(index=index, start=start, end=end, text=block["subtitle_text"]))
-        cursor = end + PAUSE_BETWEEN_BLOCKS
+        cursor = end + PAUSE_BETWEEN_BLOCKS + block.get("timeline_pad_after", 0.0)
 
     concat_file = temp_dir / "audio-concat.txt"
     concat_lines = []
