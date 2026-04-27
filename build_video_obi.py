@@ -36,16 +36,19 @@ VIDEO_CONFIGS = {
                 "spoken_text": "¿Fabricás pantalones? Agregále un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
                 "subtitle_text": "¿Fabricás pantalones? Agregále un cinturón con la misma tela de la prenda, que completa y diferencia la prenda, otorgándole mayor calidad.",
                 "images": ["1.jpeg", "2.jpeg", "AA.jpeg", "AB.jpeg"],
+                "image_weights": [1.35, 1.35, 0.65, 0.65],
             },
             {
                 "spoken_text": "Cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
                 "subtitle_text": "Cinturón bien armado, con hebilla forrada y pase metálica. Los clientes que lo han incorporado lo repiten permanentemente, señal de que el producto funciona y vende.",
                 "images": ["3.jpeg", "4.jpeg", "A.jpeg", "5.jpeg"],
+                "image_weights": [1.4, 1.35, 0.7, 0.55],
             },
             {
                 "spoken_text": "También botones forrados en la tela de la prenda, en todos los tamaños.",
                 "subtitle_text": "También botones forrados en la tela de la prenda, en todos los tamaños.",
                 "images": ["B.jpeg", "6.jpeg", "7.jpeg", "8..jpeg"],
+                "image_weights": [1.0, 1.0, 1.0, 1.0],
             },
             {
                 "spoken_text": "Hebillas forradas en todos los pases: veinte, treinta, cuarenta, cincuenta y sesenta milímetros.",
@@ -214,11 +217,26 @@ def build_slides(cues: list[Cue]) -> list[Slide]:
         if not image_paths:
             raise FileNotFoundError("No encontre imagenes para uno de los bloques del video.")
 
-        per_image = (cue.end - cue.start) / len(image_paths)
-        for index, image_path in enumerate(image_paths):
-            start = cue.start + per_image * index
-            end = cue.start + per_image * (index + 1)
+        weights = block.get("image_weights")
+        if weights is not None:
+            if len(weights) != len(block["images"]):
+                raise ValueError("La cantidad de image_weights no coincide con la cantidad de images.")
+            filtered_weights = [weight for weight, name in zip(weights, block["images"]) if (CURRENT_CONFIG["source_dir"] / name).exists()]
+        else:
+            filtered_weights = [1.0] * len(image_paths)
+
+        total_weight = sum(filtered_weights)
+        if total_weight <= 0:
+            raise ValueError("Los image_weights deben sumar un valor mayor a cero.")
+
+        cursor = cue.start
+        cue_duration = cue.end - cue.start
+        for index, (image_path, weight) in enumerate(zip(image_paths, filtered_weights)):
+            duration = cue_duration * (weight / total_weight)
+            start = cursor
+            end = cue.end if index == len(image_paths) - 1 else start + duration
             slides.append(Slide(path=image_path, start=start, end=end))
+            cursor = end
 
     return slides
 
