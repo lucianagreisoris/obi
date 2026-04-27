@@ -19,13 +19,15 @@ ROOT = Path(__file__).resolve().parent
 OUTPUT_DIR = ROOT / "assets" / "generated"
 
 VIDEO_SIZE = (1280, 720)
-PHOTO_AREA_HEIGHT = 590
+PHOTO_AREA_HEIGHT = VIDEO_SIZE[1]
 FPS = 30
 VOICE = "es-AR-TomasNeural"
-VOICE_RATE = "-14%"
-VOICE_PITCH = "+0Hz"
+VOICE_RATE = "-20%"
+VOICE_PITCH = "-10Hz"
 PAUSE_BETWEEN_BLOCKS = 0.35
 TAIL_PAD_SECONDS = 0.25
+SUBTITLE_WRAP = 24
+SUBTITLE_PANEL_WIDTH = 310
 
 VIDEO_CONFIGS = {
     "video1": {
@@ -115,7 +117,7 @@ def seconds_to_srt(value: float) -> str:
 def write_srt(cues: Iterable[Cue], destination: Path) -> None:
     parts = []
     for cue in cues:
-        wrapped = textwrap.fill(cue.text, width=44)
+        wrapped = textwrap.fill(cue.text, width=SUBTITLE_WRAP)
         parts.append(
             f"{cue.index}\n"
             f"{seconds_to_srt(cue.start)} --> {seconds_to_srt(cue.end)}\n"
@@ -291,7 +293,7 @@ def build_slide_frame(slide: Slide, current_time: float) -> Image.Image:
     progress = ease((current_time - slide.start) / slide_duration)
 
     source = Image.open(slide.path).convert("RGB")
-    photo_size = (VIDEO_SIZE[0], PHOTO_AREA_HEIGHT)
+    photo_size = VIDEO_SIZE
 
     background = fit_cover(source, photo_size)
     background = background.filter(ImageFilter.GaussianBlur(radius=28))
@@ -305,17 +307,19 @@ def build_slide_frame(slide: Slide, current_time: float) -> Image.Image:
     left = max(0, min(source.width - crop_w, (source.width - crop_w) // 2 + pan_x))
     top = max(0, min(source.height - crop_h, (source.height - crop_h) // 2 + pan_y))
     foreground = source.crop((left, top, left + crop_w, top + crop_h))
-    foreground = fit_contain(foreground, (VIDEO_SIZE[0] - 140, PHOTO_AREA_HEIGHT - 56))
+    right_panel_left = VIDEO_SIZE[0] - SUBTITLE_PANEL_WIDTH - 34
+    content_width = right_panel_left - 64
+    foreground = fit_contain(foreground, (content_width, VIDEO_SIZE[1] - 96))
 
     frame = Image.new("RGBA", VIDEO_SIZE, "#201713")
     frame.paste(background.convert("RGBA"), (0, 0))
 
-    panel = Image.new("RGBA", (VIDEO_SIZE[0] - 80, PHOTO_AREA_HEIGHT - 24), (255, 248, 241, 42))
+    panel = Image.new("RGBA", (VIDEO_SIZE[0] - 80, VIDEO_SIZE[1] - 28), (255, 248, 241, 34))
     panel = panel.filter(ImageFilter.GaussianBlur(radius=1))
     frame.paste(panel, (40, 14), panel)
 
-    fg_left = (VIDEO_SIZE[0] - foreground.width) // 2
-    fg_top = (PHOTO_AREA_HEIGHT - foreground.height) // 2
+    fg_left = 40 + max(0, (content_width - foreground.width) // 2)
+    fg_top = (VIDEO_SIZE[1] - foreground.height) // 2
     shadow = Image.new("RGBA", (foreground.width + 20, foreground.height + 20), (0, 0, 0, 0))
     shadow_draw = ImageDraw.Draw(shadow)
     shadow_draw.rounded_rectangle(
@@ -334,9 +338,17 @@ def build_slide_frame(slide: Slide, current_time: float) -> Image.Image:
     draw.rounded_rectangle((28, 28, 28 + badge_width, 68), radius=18, fill="#8f3f27")
     draw.text((50, 39), brand_text, font=brand_font, fill="#fff8f2")
 
-    band_top = PHOTO_AREA_HEIGHT
-    draw.rectangle((0, band_top, VIDEO_SIZE[0], VIDEO_SIZE[1]), fill="#ffffff")
-    draw.line((52, band_top + 18, VIDEO_SIZE[0] - 52, band_top + 18), fill="#d8d8d8", width=2)
+    subtitle_panel = Image.new("RGBA", (SUBTITLE_PANEL_WIDTH, VIDEO_SIZE[1] - 220), (0, 0, 0, 0))
+    subtitle_draw = ImageDraw.Draw(subtitle_panel)
+    subtitle_draw.rounded_rectangle(
+        (0, 0, subtitle_panel.width, subtitle_panel.height),
+        radius=28,
+        fill=(20, 15, 12, 162),
+        outline=(255, 255, 255, 28),
+        width=1,
+    )
+    subtitle_panel = subtitle_panel.filter(ImageFilter.GaussianBlur(radius=0.6))
+    frame.paste(subtitle_panel, (right_panel_left, 110), subtitle_panel)
     return frame
 
 
@@ -400,8 +412,9 @@ def export_video(
 
     subtitle_filter = (
         f"subtitles=../{subtitle_path.name}:"
-        "force_style='FontName=Arial,FontSize=22,PrimaryColour=&H000000&,"
-        "BackColour=&HFFFFFF&,BorderStyle=3,Outline=0,Shadow=0,MarginV=24,Alignment=2',"
+        "force_style='FontName=Segoe UI Semibold,FontSize=20,PrimaryColour=&H00FFFFFF&,"
+        "OutlineColour=&H00221814&,BackColour=&H00000000&,BorderStyle=1,Outline=1.2,"
+        "Shadow=0,MarginL=0,MarginR=56,MarginV=0,Alignment=6',"
         "setsar=1"
     )
     final_command = [

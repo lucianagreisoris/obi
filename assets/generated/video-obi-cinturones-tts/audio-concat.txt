@@ -1,11 +1,11 @@
 file 'block-01.mp3'
-duration 10.890
+duration 11.650
 file 'block-02.mp3'
-duration 12.730
+duration 13.650
 file 'block-03.mp3'
-duration 5.770
+duration 6.180
 file 'block-04.mp3'
-duration 8.630
+duration 9.250
 file 'block-05.mp3'
-duration 5.910
+duration 6.350
 file 'block-05.mp3'
