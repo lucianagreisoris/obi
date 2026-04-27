@@ -199,9 +199,9 @@ textarea {
 
 .intro-callout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 1rem 1.5rem;
-  align-items: center;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+  align-items: start;
   margin-bottom: 1.8rem;
   padding: 1.1rem 1.2rem;
   border: 1px solid var(--line);
@@ -246,14 +246,21 @@ textarea {
 
 .intro-copy {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.2rem;
 }
 
 .intro-note {
   margin: 0;
-  color: rgba(54, 43, 33, 0.72);
-  font-size: 0.84rem;
-  line-height: 1.4;
+  color: rgba(54, 43, 33, 0.78);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.service-links {
+  width: 100%;
 }
 
 .eyebrow {
