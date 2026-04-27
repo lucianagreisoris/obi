@@ -1,5 +1,5 @@
 file 'block-01.mp3'
-duration 10.790
+duration 10.890
 file 'block-02.mp3'
 duration 12.730
 file 'block-03.mp3'

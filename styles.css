@@ -282,6 +282,13 @@ textarea {
   gap: 0.45rem;
 }
 
+.intro-note {
+  margin: 0;
+  color: rgba(54, 43, 33, 0.72);
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
 .eyebrow {
   margin: 0;
   color: var(--accent);
